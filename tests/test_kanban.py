@@ -73,8 +73,10 @@ def test_state_update_does_not_reload_file_again(tmp_path, monkeypatch):
     original = kb.TASKS_FILE
     kb.TASKS_FILE = tasks_file
     popen_calls = []
+    def fail_on_reload(*_args, **_kwargs):
+        raise AssertionError('unexpected reload')
     monkeypatch.setattr(kb.subprocess, 'Popen', lambda *args, **kwargs: popen_calls.append((args, kwargs)))
-    monkeypatch.setattr(kb, 'atomic_json_read', lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError('unexpected reload')))
+    monkeypatch.setattr(kb, 'atomic_json_read', fail_on_reload)
     try:
         kb.cmd_state('T-3', 'Doing')
         tasks = json.loads(tasks_file.read_text())

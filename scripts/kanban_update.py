@@ -67,6 +67,7 @@ def load():
     return atomic_json_read(TASKS_FILE, [])
 
 def trigger_refresh():
+    """异步触发 REFRESH_SCRIPT 更新 live_status，避免阻塞主更新流程。"""
     # 异步触发刷新，不阻塞调用方
     try:
         subprocess.Popen(['python3', str(REFRESH_SCRIPT)],
